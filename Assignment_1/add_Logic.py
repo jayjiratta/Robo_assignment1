@@ -6,6 +6,8 @@ tof_distance = None
 io_data = None
 MAX_SPEED = 1
 WALL_DISTANCE_THRESHOLD = 300
+status_tof = False
+status_ss_1 = False
 
 
 def tof_data_handler(sub_info):
@@ -38,14 +40,13 @@ def main():
 
     try:
         while True:
-            global adc_1, status_ss_1
             adc_1 = ep_sensor_adaptor.get_adc(id=1, port=1)
             if 250 < adc_1 < 350:
                 status_ss_1 = True
             else:
                 status_ss_1 = False
             # print(f"ToF distance: {adc_1} mm")
-            print(f"status_tof {status_ss_1}")
+            print(f"ADC value: {adc_1}, status_ss_1: {status_ss_1}")
             time.sleep(1)
 
             print("****************************")
@@ -54,7 +55,7 @@ def main():
             ).wait_for_completed()
             time.sleep(0.5)
 
-            if tof_distance is None or io_data is None:
+            if tof_distance is None:
                 print("Waiting for sensor data...")
                 time.sleep(1)
                 continue
@@ -62,15 +63,14 @@ def main():
             gap = abs(WALL_DISTANCE_THRESHOLD - tof_distance)
             walk_y = gap / 1000
 
-            if status_tof == True and status_ss_1 == True:
-                print("Left")
+            if status_tof and status_ss_1:
+                print("Turning Left")
                 ep_chassis.move(x=0, y=0, z=90, xy_speed=MAX_SPEED).wait_for_completed()
                 ep_gimbal.recenter().wait_for_completed()
                 time.sleep(1)
-
-            elif status_tof == True and status_ss_1 == False:
+            elif status_tof and not status_ss_1:
                 if tof_distance > 500:
-                    print("Right")
+                    print("Turning Right")
                     ep_chassis.move(
                         x=0, y=0, z=-90, xy_speed=MAX_SPEED
                     ).wait_for_completed()
@@ -78,26 +78,24 @@ def main():
                     time.sleep(1)
                 else:
                     if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
-                        print("Turn left")
+                        print("Moving Left")
                         ep_chassis.move(
                             x=0, y=-walk_y, z=0, xy_speed=MAX_SPEED
                         ).wait_for_completed()
                     elif tof_distance > WALL_DISTANCE_THRESHOLD + 50:
-                        print("Turn right")
+                        print("Moving Right")
                         ep_chassis.move(
                             x=0, y=walk_y, z=0, xy_speed=MAX_SPEED
                         ).wait_for_completed()
-
-            elif status_tof == False and status_ss_1 == True:
-                print("Drive forward")
+            elif not status_tof and status_ss_1:
+                print("Driving Forward")
                 ep_chassis.move(
                     x=0.1, y=0, z=0, xy_speed=MAX_SPEED
                 ).wait_for_completed()
                 time.sleep(1)
-
-            elif status_tof == False and status_ss_1 == False:
+            elif not status_tof and not status_ss_1:
                 if tof_distance > 500:
-                    print("Right")
+                    print("Turning Right")
                     ep_chassis.move(
                         x=0, y=0, z=-90, xy_speed=MAX_SPEED
                     ).wait_for_completed()
@@ -105,12 +103,12 @@ def main():
                     time.sleep(1)
                 else:
                     if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
-                        print("Turn left")
+                        print("Moving Left")
                         ep_chassis.move(
                             x=0, y=-walk_y, z=0, xy_speed=MAX_SPEED
                         ).wait_for_completed()
                     elif tof_distance > WALL_DISTANCE_THRESHOLD + 50:
-                        print("Turn right")
+                        print("Moving Right")
                         ep_chassis.move(
                             x=0, y=walk_y, z=0, xy_speed=MAX_SPEED
                         ).wait_for_completed()
