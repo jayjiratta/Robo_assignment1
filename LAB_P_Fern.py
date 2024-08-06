@@ -65,7 +65,7 @@ def main():
                 time.sleep(1)
                 continue
 
-            gap = abs(WALL_DISTANCE_THRESHOLD - tof_distance)
+            gap = abs(WALL_DISTANCE_THRESHOLD - adc_1)
             walk_y = gap / 1000
 
             if status_tof == True and status_ss == True:
@@ -77,12 +77,12 @@ def main():
                 time.sleep(1)
 
             elif status_tof == True and status_ss == False:
-                if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
+                if adc_1 < WALL_DISTANCE_THRESHOLD - 50:
                     print("กระเถิบ left")
                     ep_chassis.move(
                         x=0, y=-walk_y, z=0, xy_speed=MAX_SPEED
                     ).wait_for_completed()
-                elif tof_distance > WALL_DISTANCE_THRESHOLD + 50:
+                elif adc_1 > WALL_DISTANCE_THRESHOLD + 50:
                     print("กระเถิบ right")
                     ep_chassis.move(
                         x=0, y=walk_y, z=0, xy_speed=MAX_SPEED
@@ -96,12 +96,12 @@ def main():
                 time.sleep(1)
 
             elif status_tof == False and status_ss == False:
-                if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
+                if adc_1 < WALL_DISTANCE_THRESHOLD - 50:
                     print("กระเถิบ left")
                     ep_chassis.move(
                         x=0, y=-walk_y, z=0, xy_speed=MAX_SPEED
                     ).wait_for_completed()
-                elif tof_distance > WALL_DISTANCE_THRESHOLD + 50:
+                elif adc_1 > WALL_DISTANCE_THRESHOLD + 50:
                     print("กระเถิบ right")
                     ep_chassis.move(
                         x=0, y=walk_y, z=0, xy_speed=MAX_SPEED
