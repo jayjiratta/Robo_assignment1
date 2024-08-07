@@ -5,13 +5,13 @@ import time
 tof_distance = None
 adc_1 = None
 MAX_SPEED = 1
-WALL_DISTANCE_THRESHOLD = 300
+WALL_DISTANCE_THRESHOLD = 200
 
 
 def tof_data_handler(sub_info):
     global tof_distance, status_tof
     tof_distance = sub_info[0]
-    if 250 < tof_distance < 350:
+    if 150 < tof_distance < 250:
         status_tof = True
     else:
         status_tof = False
@@ -19,7 +19,8 @@ def tof_data_handler(sub_info):
 
     global adc_1, status_ss_1
     adc_1 = ep_sensor_adaptor.get_adc(id=1, port=2)
-    if 600 < adc_1 < 700:
+    print(adc_1)
+    if 375 < adc_1 < 850:
         status_ss_1 = True
     else:
         status_ss_1 = False
@@ -64,11 +65,17 @@ if __name__ == "__main__":
                 time.sleep(1)
             elif status_tof == False and status_ss_1 == True:
                 if tof_distance > 500:
+                    ep_chassis.move(
+                        x=0.2, y=0, z=0, xy_speed=MAX_SPEED
+                    ).wait_for_completed()
                     print("Right")
                     ep_chassis.move(
                         x=0, y=0, z=-90, xy_speed=MAX_SPEED
                     ).wait_for_completed()
                     ep_gimbal.recenter().wait_for_completed()
+                    ep_chassis.move(
+                        x=0.4, y=0, z=0, xy_speed=MAX_SPEED
+                    ).wait_for_completed()
                     time.sleep(1)
                 else:
                     if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
@@ -89,11 +96,17 @@ if __name__ == "__main__":
                 time.sleep(1)
             elif status_tof == False and status_ss_1 == False:
                 if tof_distance > 500:
+                    ep_chassis.move(
+                        x=0.2, y=0, z=0, xy_speed=MAX_SPEED
+                    ).wait_for_completed()
                     print("Right")
                     ep_chassis.move(
                         x=0, y=0, z=-90, xy_speed=MAX_SPEED
                     ).wait_for_completed()
                     ep_gimbal.recenter().wait_for_completed()
+                    ep_chassis.move(
+                        x=0.4, y=0, z=0, xy_speed=MAX_SPEED
+                    ).wait_for_completed()
                     time.sleep(1)
                 else:
                     if tof_distance < WALL_DISTANCE_THRESHOLD - 50:
