@@ -3,7 +3,7 @@ from robomaster import robot
 import time
 
 tof_distance = None
-io_data = None
+adc_1 = None
 MAX_SPEED = 1
 WALL_DISTANCE_THRESHOLD = 300
 
@@ -54,7 +54,7 @@ def main():
             ).wait_for_completed()
             time.sleep(0.5)
 
-            if tof_distance is None or io_data is None:
+            if tof_distance is None or adc_1 is None:
                 print("Waiting for sensor data...")
                 time.sleep(1)
                 continue
