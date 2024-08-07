@@ -16,16 +16,15 @@ def tof_data_handler(sub_info):
     else:
         status_tof = False
     # print(f"ToF distance: {tof_distance} mm")
-    print(f"status_tof {status_tof}")
 
     global adc_1, status_ss_1
-    adc_1 = ep_sensor_adaptor.get_adc(id=1, port=1)
-    if 250 < adc_1 < 350:
+    adc_1 = ep_sensor_adaptor.get_adc(id=1, port=2)
+    if 600 < adc_1 < 700:
         status_ss_1 = True
     else:
         status_ss_1 = False
     # print(f"ToF distance: {adc_1} mm")
-    print(f"status_ss_1 {status_ss_1}")
+    print(f"status_tof {status_tof} , status_ss_1 {status_ss_1}")
     time.sleep(1)
 
 
@@ -44,8 +43,7 @@ if __name__ == "__main__":
     ep_gimbal.recenter().wait_for_completed()
     try:
         while True:
-
-            print("****************************")
+            print("************")
             ep_gimbal.moveto(
                 pitch=0, yaw=90, pitch_speed=0, yaw_speed=30
             ).wait_for_completed()
@@ -54,14 +52,17 @@ if __name__ == "__main__":
                 print("Waiting for sensor data...")
                 time.sleep(1)
                 continue
+
             gap = abs(WALL_DISTANCE_THRESHOLD - tof_distance)
+
             walk_y = gap / 1000
+
             if status_tof == True and status_ss_1 == True:
                 print("Left")
                 ep_chassis.move(x=0, y=0, z=90, xy_speed=MAX_SPEED).wait_for_completed()
                 ep_gimbal.recenter().wait_for_completed()
                 time.sleep(1)
-            elif status_tof == True and status_ss_1 == False:
+            elif status_tof == False and status_ss_1 == True:
                 if tof_distance > 500:
                     print("Right")
                     ep_chassis.move(
@@ -80,7 +81,7 @@ if __name__ == "__main__":
                         ep_chassis.move(
                             x=0, y=walk_y, z=0, xy_speed=MAX_SPEED
                         ).wait_for_completed()
-            elif status_tof == False and status_ss_1 == True:
+            elif status_tof == True and status_ss_1 == False:
                 print("Drive forward")
                 ep_chassis.move(
                     x=0.1, y=0, z=0, xy_speed=MAX_SPEED
