@@ -21,10 +21,21 @@ def tof_data_handler(sub_info):
     print(f"status_tof {status_tof}")
 
 
+def read_adc(ep_sensor_adaptor):
+    global status_ss_1
+    adc_1 = ep_sensor_adaptor.get_adc(id=1, port=1)
+    if 250 < adc_1 < 350:
+        status_ss_1 = True
+    else:
+        status_ss_1 = False
+    print(f"ADC value: {adc_1}, status_ss_1: {status_ss_1}")
+    return adc_1
+
+
 print("****************************")
 
 
-def main():
+if __name__ == "__main__":
     ep_robot = robot.Robot()
     print("Initializing robot...")
     ep_robot.initialize(conn_type="ap")
@@ -40,13 +51,7 @@ def main():
 
     try:
         while True:
-            adc_1 = ep_sensor_adaptor.get_adc(id=1, port=1)
-            if 250 < adc_1 < 350:
-                status_ss_1 = True
-            else:
-                status_ss_1 = False
-            # print(f"ToF distance: {adc_1} mm")
-            print(f"ADC value: {adc_1}, status_ss_1: {status_ss_1}")
+            read_adc(ep_sensor_adaptor)
             time.sleep(1)
 
             print("****************************")
@@ -125,7 +130,3 @@ def main():
         ep_chassis.drive_speed(x=0, y=0, z=0)
         ep_robot.close()
         print("Program ended.")
-
-
-if __name__ == "__main__":
-    main()
