@@ -3,7 +3,7 @@ from robomaster import robot
 import time
 
 tof_distance = None
-io_data = None
+adc_1 = None
 MAX_SPEED = 1
 WALL_DISTANCE_THRESHOLD = 300
 status_tof = False
@@ -21,15 +21,14 @@ def tof_data_handler(sub_info):
     print(f"status_tof {status_tof}")
 
 
-def read_adc(ep_sensor_adaptor):
-    global status_ss_1
-    adc_1 = ep_sensor_adaptor.get_adc(id=1, port=1)
+def adc_data_handler(sub_info):
+    global adc_1, status_ss_1
+    adc_1 = sub_info[0]
     if 250 < adc_1 < 350:
         status_ss_1 = True
     else:
         status_ss_1 = False
     print(f"ADC value: {adc_1}, status_ss_1: {status_ss_1}")
-    return adc_1
 
 
 print("****************************")
@@ -47,11 +46,11 @@ if __name__ == "__main__":
     ep_sensor_adaptor = ep_robot.sensor_adaptor
 
     ep_sensor.sub_distance(freq=10, callback=tof_data_handler)
+    ep_sensor_adaptor.sub_adc(freq=10, id=1, port=1, callback=adc_data_handler)
     ep_gimbal.recenter().wait_for_completed()
 
     try:
         while True:
-            read_adc(ep_sensor_adaptor)
             time.sleep(1)
 
             print("****************************")
